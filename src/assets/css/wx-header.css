@@ -1,0 +1,26 @@
+#wx-header {
+  position: relative;
+  z-index: 99;
+  height: 45px;
+  padding: 0 15px 0 10px;
+  line-height: 45px;
+  background: #1b1b1b;
+  opacity: 1;
+  color: #fff;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-transition: all 0.3s linear;
+  transition: all 0.3s linear
+}
+
+#wx-header .center {
+  margin: 0 auto;
+  text-align: center;
+  font-size: 17px
+}
+
+#wx-header .center span {
+  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Noto Sans CJK SC, WenQuanYi Micro Hei, Arial, sans-serif
+}
