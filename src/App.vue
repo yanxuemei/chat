@@ -46,37 +46,39 @@
           </svg>
         </div>
         <div>
-          <div class="send" v-if="light" @click="clickSend">
+          <div class="send" @click="clickSend">
             <span>发送</span>
           </div>
-          <svg @click="bottomAiShow">
-            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#addthing"></use>
-          </svg>
         </div>
       </section>
       <section class="foot_bottom">
-        <template v-show="clickface">
-          <div class="swiper-container" v-show="clickface">
-            <div class="swiper-wrapper">
-              <div class="swiper-slide" v-for="(value,item) in chatData">
-                <ul class="clear">
-                  <li v-for="(value,index) in value" @click="clickFaceId(index)">
-                    <div class="swiper_img">
-                      <img :src="value.faceid">
-                    </div>
-                  </li>
-                </ul>
+        <template>
+          <el-tabs type="border-card">
+            <el-tab-pane label="斗图">
+              <div class="swiper-container">
+              <div class="swiper-wrapper">
+                <div class="swiper-slide" v-for="(value,key) in chatData">
+                  <ul class="clear">
+                    <li v-for="(value,index) in value" @click="clickFaceId(key,index)">
+                      <div class="swiper_img">
+                        <img :src="value.faceid">
+                      </div>
+                    </li>
+                  </ul>
+                </div>
               </div>
+              <div class="swiper-pagination"></div>
             </div>
-            <div class="swiper-pagination"></div>
-          </div>
-        </template>
-        <template v-show="clickai">
-          <ul class="ai">
-            <li v-for="(item,index) in aiData" @click="clickAi(index)">
-              {{item.text}}
-            </li>
-          </ul>
+            </el-tab-pane>
+            <el-tab-pane label="AI"><ul class="ai">
+              <li v-for="(item,index) in aiData" @click="clickAi(index)">
+                {{item.text}}
+              </li>
+            </ul>
+            </el-tab-pane>
+            <el-tab-pane label="颜文字"></el-tab-pane>
+            <el-tab-pane label="表情"></el-tab-pane>
+          </el-tabs>
         </template>
       </section>
     </footer>
@@ -89,6 +91,7 @@
   import './config/swiper.min.js'
   import './style/swiper.min.css'
   import {dialog, chatData, aiData,robot} from './service/getData'
+  import * as chatFace from "./api/chatFace";
 
   export default {
     data() {
@@ -113,13 +116,33 @@
         this.chatData = res;
       }).then(() => {
         //初始化swiper
-        if (this.clickface) {
           new Swiper('.swiper-container', {
             pagination: '.swiper-pagination',
             loop: false,
           });
-        }
       });
+
+      //网络请求方式
+      /**
+       * 以拉取表情为例通过RESTful接口规范获取后端真实数据
+       * method:get
+       * url:api/index.js里面的默认host
+       * 请求参数：自定义  通过r()进行传入
+       * 返回数据：参考service/data数据接口
+       */
+      // chatFace.get.r().then(res => {
+      //   if (res.data.code === 200) {
+      //     this.chatData = res;
+      //   }
+      // }).then(() => {
+      //   //初始化swiper
+      //   new Swiper('.swiper-container', {
+      //     pagination: '.swiper-pagination',
+      //     loop: false,
+      //   });
+      // }).catch((error) =>{
+      // });
+
       //拉取对话详情
       dialog().then((res) => {
         this.conversine = res;
@@ -141,7 +164,7 @@
     methods: {
       //判断输入框状态
       whatInput() {
-        if (this.inputmessage.replace(/\s+/g, "") == '') {
+        if (this.inputmessage.replace(/\s+/g, "") === '') {
           this.light = false;
         } else {
           this.light = true;
@@ -149,7 +172,7 @@
       },
       //回车发送消息
       enterThing() {
-        if (this.light) {
+        if (this.inputmessage.replace(/\s+/g, "")!== '') {
           this.clickSend();
         }
       },
@@ -161,15 +184,15 @@
         this.bottomHide();
       },
       //选择发送表情消息
-      clickFaceId(index){
+      clickFaceId(key,index){
         this.conversine.push({
           "headurl": require("./assets/images/header02.jpg"),
           "type": 2,
           "sendobject": 0,
-          "Messageblob": this.chatData[0][index].faceid,
+          "Messageblob": this.chatData[key][index].faceid,
         });
         //隐藏下面窗口
-        this.bottomHide();
+        //this.bottomHide();
         //调用自动回复
         this.robotSend();
 
@@ -198,6 +221,9 @@
       },
       //消息发送
       clickSend() {
+        if (this.inputmessage.replace(/\s+/g, "")=== '') {
+          return
+        }
         this.conversine.push({
           "headurl": require("./assets/images/header02.jpg"),
           "type": 1,
@@ -265,7 +291,7 @@
       }
       ul {
         padding-top: .4rem;
-        padding-bottom: 2.2rem;
+        padding-bottom: 4.2rem;
         overflow-scrolling: touch;
         -webkit-overflow-scrolling: touch;
         top: 0;
@@ -274,7 +300,7 @@
             width: 100%;
             @include justify(flex-start);
             margin-bottom: 0.512rem;
-            align-items: top;
+            align-items: flex-start;
             img {
               display: block;
               @include widthHeight(2.5493333333rem, 2.5493333333rem);
@@ -341,7 +367,7 @@
     z-index: 10;
     border-top: 1px solid #e0e0e0;
     background: #f5f5f5;
-    bottom: -11.712rem;
+    bottom: -13.212rem;
     width: 100%;
     .foot_top {
       padding: 0 0.512rem;
@@ -398,7 +424,7 @@
       }
     }
     .foot_bottom {
-      height: 11.712rem;
+      height: 13.212rem;
       border-top: 1px solid #e0e0e0;
       .swiper-container {
         width: 100%;
@@ -407,7 +433,7 @@
         .swiper-slide {
           width: 100%;
           ul {
-            padding: 1.408rem 1.1946666667rem 0;
+            padding: 1.408rem 0.1946666667rem 0;
             box-sizing: border-box;
             li {
               display: flex;
@@ -417,11 +443,11 @@
               float: left;
               margin-bottom: 1.1946666667rem;
               .swiper_img {
-                @include widthHeight(3.5466666667rem, 3.5466666667rem);
+                @include widthHeight(3.0466666667rem, 3.0466666667rem);
                 @include justify(center);
                 align-items: center;
                 img {
-                  @include widthHeight(4.28rem, 4.0386666667rem);
+                  @include widthHeight(3.528rem, 3.3386666667rem);
                   display: block;
                 }
               }
