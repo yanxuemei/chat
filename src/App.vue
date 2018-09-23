@@ -92,6 +92,7 @@
   import './style/swiper.min.css'
   import {dialog, chatData, aiData,robot} from './service/getData'
   import * as chatFace from "./api/chatFace";
+  import * as chatRobot from "./api/chatRobot";
 
   export default {
     data() {
@@ -148,9 +149,9 @@
         this.conversine = res;
       })
       //拉取AI提示信息
-      aiData().then((res) => {
-        this.aiData = res;
-      })
+      // aiData().then((res) => {
+      //   this.aiData = res;
+      // })
 
       //拉取机器人对话信息
       robot().then((res) => {
@@ -160,6 +161,18 @@
     },
     components: {
       headTop,
+    },
+    watch: {
+      conversine: function (val) {
+        let self=this;
+        //获取对方消息
+        let params={"text":val[val.length-1].Messageblob};
+        //AI提示请求
+        chatRobot.post.r(params).then(res => {
+          self.aiData=res.data.item_list;
+        }).catch((error) =>{
+        });
+      }
     },
     methods: {
       //判断输入框状态
@@ -322,7 +335,6 @@
               .whatsay_text {
                 margin-left: 0.6399997rem;
                 max-width: 10.3253333333rem;
-                max-height: 10.3253333333rem;
                 background: #fff;
                 padding: 0.42rem 0.384rem;
                 border: 1px solid #d9d9d9;
