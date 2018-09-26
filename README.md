@@ -1,4 +1,4 @@
-# tencent-ai-chat
+# ai-chat
 
 > A Vue.js project
 
